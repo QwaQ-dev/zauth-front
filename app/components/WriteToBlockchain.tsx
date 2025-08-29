@@ -1,11 +1,10 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useClient, useAccount, useWriteContract, useWatchContractEvent} from "wagmi"
+import { useClient, useAccount, useWriteContract, useWatchContractEvent } from "wagmi"
 import Script from "next/script"
 import type { SocialAccount, WalletAccount } from "../../types"
 import contractABI from "../lib/conctractABI.json"
-import { config } from "process"
 
 interface WriteToBlockchainProps {
   socials: SocialAccount[]
@@ -18,9 +17,7 @@ interface LogEntry {
 }
 
 const SOCIAL_PLATFORM_IDS: Record<string, number> = {
-  x: 1, // X (Twitter)
-  email: 2, // Gmail
-  github: 3, // GitHub
+  github: 1,
 }
 
 export default function WriteToBlockchain({ socials, wallets }: WriteToBlockchainProps) {
@@ -41,32 +38,32 @@ export default function WriteToBlockchain({ socials, wallets }: WriteToBlockchai
     setLogs((prev) => [...prev, { message, timestamp }])
   }
 
+  // Проверка и инициализация Relayer SDK
   useEffect(() => {
-    if (window.relayerSDK) {
-      addLog("Relayer SDK уже доступен в window.relayerSDK")
-      console.log("Relayer SDK:", window.relayerSDK)
+    const checkSDK = async () => {
+      if (window.relayerSDK) {
+        addLog("Relayer SDK уже доступен в window.relayerSDK")
+        await initializeFHE()
+      } else {
+        addLog("Relayer SDK не найден, ожидаем загрузку...")
+      }
     }
+    checkSDK()
   }, [])
 
-  useWatchContractEvent(
-    { 
-      address: '0x92832861e7678a9823c47893F435353961767e00', 
-      abi: contractABI, 
-      eventName: 'UserRegistered', 
-      onLogs(logs) { 
-        console.log('New logs!', logs) 
-      }, 
-      onError(error) { 
-        console.log('Error', error) 
-      } 
-      })
+  useWatchContractEvent({
+    address: '0x92832861e7678a9823c47893F435353961767e00',
+    abi: contractABI,
+    eventName: 'UserRegistered',
+    onLogs(logs) { console.log('New logs!', logs) },
+    onError(error) { console.log('Error', error) },
+  })
 
   const initializeFHE = async () => {
     addLog("Начинаем инициализацию FHE...")
     try {
       if (!window.relayerSDK) throw new Error("Relayer SDK не загружен")
-      if (typeof SharedArrayBuffer === "undefined")
-        throw new Error("SharedArrayBuffer не поддерживается")
+      if (typeof SharedArrayBuffer === "undefined") throw new Error("SharedArrayBuffer не поддерживается")
       if (!window.ethereum) throw new Error("Web3-провайдер не обнаружен")
 
       if (!window.ethereum.selectedAddress) {
@@ -78,8 +75,7 @@ export default function WriteToBlockchain({ socials, wallets }: WriteToBlockchai
 
       const chainId = await window.ethereum.request({ method: "eth_chainId" })
       const sepoliaChainId = "0xaa36a7"
-      if (chainId !== sepoliaChainId)
-        throw new Error(`Переключитесь на сеть Sepolia (chainId: ${chainId})`)
+      if (chainId !== sepoliaChainId) throw new Error(`Переключитесь на сеть Sepolia (chainId: ${chainId})`)
 
       const { initSDK, createInstance, SepoliaConfig } = window.relayerSDK
       await initSDK()
@@ -144,15 +140,12 @@ export default function WriteToBlockchain({ socials, wallets }: WriteToBlockchai
 
       addLog("Данные зашифрованы, отправляем транзакцию...")
 
-      console.log(ciphertexts)
       const tx = await writeContract({
         address: contractAddress,
         abi: contractABI,
         functionName: "getUserSocialMediaIndicator",
         args: [address],
       })
-
-      console.log(tx)
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Неизвестная ошибка"
       addLog(`Ошибка записи в блокчейн: ${errorMessage}`)
@@ -161,11 +154,7 @@ export default function WriteToBlockchain({ socials, wallets }: WriteToBlockchai
       setIsWriting(false)
       addLog("Запись в блокчейн завершена")
     }
-
-    
   }
-
-  
 
   const canWrite = isConnected && connectedSocials.length > 0 && isFHEInitialized
 
@@ -174,11 +163,14 @@ export default function WriteToBlockchain({ socials, wallets }: WriteToBlockchai
       <Script
         src="https://cdn.zama.ai/relayer-sdk-js/0.1.0-9/relayer-sdk-js.umd.cjs"
         strategy="afterInteractive"
-        onLoad={() => addLog("Скрипт Relayer SDK загружен")}
+        onLoad={() => {
+          addLog("Скрипт Relayer SDK загружен")
+          initializeFHE()
+        }}
         onError={(err: any) => setFheError(`Ошибка загрузки SDK: ${err?.message || err}`)}
       />
 
-      {!isFHEInitialized && (
+      {!isFHEInitialized && !fheError && (
         <button
           onClick={initializeFHE}
           className="w-full rounded-lg bg-blue-600 text-white px-4 py-3 font-medium hover:bg-blue-700"
