@@ -9,15 +9,11 @@ import { useAccount } from "wagmi"
 import WriteToBlockchain from "./components/WriteToBlockchain"
 
 const DEFAULT_SOCIALS: SocialAccount[] = [
-  { id: 1, key: "x", name: "Connect your X", isConnected: false },
-  { id: 2, key: "email", name: "Connect your Gmail", isConnected: false },
-  { id: 3, key: "github", name: "Connect your GitHub", isConnected: false },
+  { id: 1, key: "github", name: "Connect your GitHub", isConnected: false },
 ]
 
 const DEFAULT_WALLETS: WalletAccount[] = [
   { id: 1, key: "metamask", name: "Connet your Metamask", isConnected: false },
-  { id: 2, key: "phantom", name: "Connect your Phantom", isConnected: false },
-  { id: 3, key: "tonkeeper", name: "Connect your Tonkeeper", isConnected: false },
 ]
 
 export default function Page() {
@@ -37,20 +33,10 @@ export default function Page() {
     setAddr(address ?? null)
   }, [address, setAddr])
 
-  const handleSocialConnect = (id: number, platform: string) => {
-    // Listen for successful auth messages
-    const handleAuthSuccess = (event: MessageEvent) => {
-      if (event.data.type === "SOCIAL_AUTH_SUCCESS") {
-        const userData = event.data.user
+  const handleSocialConnect = (id: number, key: string, userData: any) => {
+   
+    setSocials((prev) => prev.map((s) => (s.id === id ? { ...s, isConnected: true, name: userData.username } : s)))
 
-        // Update the social account with user data
-        setSocials((prev) => prev.map((s) => (s.id === id ? { ...s, isConnected: true, name: userData.username } : s)))
-
-        window.removeEventListener("message", handleAuthSuccess)
-      }
-    }
-
-    window.addEventListener("message", handleAuthSuccess)
   }
 
   const handleWalletConnect = (id: number, address: string, name: string) => {
@@ -65,10 +51,10 @@ export default function Page() {
 
   if (!mounted) {
     return (
-      <main className="grid min-h-screen place-items-center bg-stone-400 py-10 text-black">
+      <main className="grid min-h-screen place-items-center bg-stone-400 py-10 text-black" style={{ fontFamily: "HomeVideo, sans-serif" }}>
         <section className="mx-auto w-[480px] rounded-[22px] border-2 border-black bg-stone-100 p-6 shadow-lg">
           <header className="mb-6 text-center">
-            <h1 className="text-4xl font-bold text-black mb-4" style={{ fontFamily: "HomeVideo, sans-serif" }}>
+            <h1 className="text-4xl font-bold text-black mb-4">
               zauth
             </h1>
           </header>
@@ -79,10 +65,10 @@ export default function Page() {
   }
 
   return (
-    <main className="grid min-h-screen place-items-center bg-stone-400 py-10 text-black">
+    <main className="grid min-h-screen place-items-center bg-stone-400 py-10 text-black" style={{ fontFamily: "HomeVideo, sans-serif" }}>
       <section className="mx-auto w-[480px] rounded-[22px] border-2 border-black bg-stone-100 p-6 shadow-lg">
         <header className="mb-6 text-center">
-          <h1 className="text-4xl font-bold text-black mb-4" style={{ fontFamily: "HomeVideo, sans-serif" }}>
+          <h1 className="text-4xl font-bold text-black mb-4">
             zauth
           </h1>
         </header>
