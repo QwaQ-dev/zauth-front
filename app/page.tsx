@@ -6,7 +6,6 @@ import { WalletList } from "./components/WalletList"
 import type { SocialAccount, WalletAccount } from "@/types"
 import { useLocalStorage } from "./hooks/useLocalStorage"
 import { useAccount } from "wagmi"
-import WriteToBlockchain from "./components/WriteToBlockchain"
 
 const DEFAULT_SOCIALS: SocialAccount[] = [
   { id: 1, key: "github", name: "Connect your GitHub", isConnected: false },
@@ -28,15 +27,12 @@ export default function Page() {
     setMounted(true)
   }, [])
 
-  // зеркалим адрес кошелька в localStorage
   useEffect(() => {
     setAddr(address ?? null)
   }, [address, setAddr])
 
   const handleSocialConnect = (id: number, key: string, userData: any) => {
-   
     setSocials((prev) => prev.map((s) => (s.id === id ? { ...s, isConnected: true, name: userData.username } : s)))
-
   }
 
   const handleWalletConnect = (id: number, address: string, name: string) => {
@@ -54,9 +50,7 @@ export default function Page() {
       <main className="grid min-h-screen place-items-center bg-stone-400 py-10 text-black" style={{ fontFamily: "HomeVideo, sans-serif" }}>
         <section className="mx-auto w-[480px] rounded-[22px] border-2 border-black bg-stone-100 p-6 shadow-lg">
           <header className="mb-6 text-center">
-            <h1 className="text-4xl font-bold text-black mb-4">
-              zauth
-            </h1>
+            <h1 className="text-4xl font-bold text-black mb-4">zauth</h1>
           </header>
           <div className="text-center text-stone-600">Loading...</div>
         </section>
@@ -68,11 +62,8 @@ export default function Page() {
     <main className="grid min-h-screen place-items-center bg-stone-400 py-10 text-black" style={{ fontFamily: "HomeVideo, sans-serif" }}>
       <section className="mx-auto w-[480px] rounded-[22px] border-2 border-black bg-stone-100 p-6 shadow-lg">
         <header className="mb-6 text-center">
-          <h1 className="text-4xl font-bold text-black mb-4">
-            zauth
-          </h1>
+          <h1 className="text-4xl font-bold text-black mb-4">zauth</h1>
         </header>
-
         <div className="grid gap-6">
           <h3 className="mb-3 rounded-full border-2 border-black bg-stone-300 px-4 py-1 text-xl font-medium text-black inline-block">
             socials
@@ -83,9 +74,13 @@ export default function Page() {
           </h3>
           <WalletList wallets={wallets} onToggle={toggleWallet} onWalletConnect={handleWalletConnect} />
         </div>
-
-        <div className="mt-6">
-          <WriteToBlockchain socials={socials} wallets={wallets} />
+        <div className="mt-6 text-center">
+          <a
+            href="/fhe"
+            className="rounded-full border-2 border-black bg-stone-300 px-6 py-2 text-xl font-medium text-black hover:bg-stone-400 transition-colors duration-200"
+          >
+            Перейти к FHE
+          </a>
         </div>
       </section>
     </main>
