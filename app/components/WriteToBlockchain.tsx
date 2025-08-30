@@ -8,9 +8,12 @@ import {
   useWaitForTransactionReceipt,
   type BaseError,
 } from "wagmi";
+import { readContract } from "wagmi/actions";
 import Script from "next/script";
 import type { SocialAccount, WalletAccount } from "../../types";
 import contractABI from "../lib/conctractABI.json";
+import { wagmiConfig } from "../lib/wagmiConfig.ts";
+import { bytesToHex, hexToBigInt } from "viem";
 
 interface WriteToBlockchainProps {
   socials: SocialAccount[];
@@ -21,6 +24,8 @@ interface LogEntry {
   message: string;
   timestamp: string;
 }
+
+const contractAddress = "0x92832861e7678a9823c47893F435353961767e00";
 
 const SOCIAL_PLATFORM_IDS: Record<string, number> = {
   github: 1,
@@ -33,6 +38,7 @@ export default function WriteToBlockchain({
   const client = useClient();
   const { address, isConnected } = useAccount();
   const { writeContract, data: hash, isPending, error } = useWriteContract();
+
 
   const [isWriting, setIsWriting] = useState(false);
   const [isFHEInitialized, setIsFHEInitialized] = useState(false);
@@ -63,6 +69,32 @@ export default function WriteToBlockchain({
     };
     checkSDK();
   }, []);
+
+  useEffect(() => {
+    if (isConfirmed && address) {
+      (async () => {
+        try {
+          const result = await readContract(wagmiConfig, {
+            address: contractAddress,
+            abi: contractABI,
+            functionName: "getUserSocialMediaIndicator",
+            args: [address],
+          });
+  
+          console.log("THX HASH", hash);
+          console.log("Indicator raw:", result);
+  
+          const asBigInt = hexToBigInt(result as `0x${string}`);
+          console.log("Indicator as bigint:", asBigInt);
+          console.log("Indicator as decimal string:", asBigInt.toString());
+  
+          addLog("Successfully written to blockchain");
+        } catch (err) {
+          console.error("Read error", err);
+        }
+      })();
+    }
+  }, [isConfirmed, address, hash]);
 
   const initializeFHE = async () => {
     addLog("Initialiazing FHE...");
@@ -146,8 +178,6 @@ export default function WriteToBlockchain({
         throw new Error(errorMessage);
       }
 
-      const contractAddress = "0x92832861e7678a9823c47893F435353961767e00";
-
       const buffer = await fheInstance.createEncryptedInput(
         contractAddress,
         address,
@@ -166,21 +196,26 @@ export default function WriteToBlockchain({
       console.log("ciphertexts.inputProof", ciphertexts.inputProof);
       console.log("ciphertexts", ciphertexts);
 
-      const thx = writeContract({
+      writeContract({
         address: contractAddress,
         abi: contractABI,
         functionName: "registerUser",
-        args: [String(address), ciphertexts.handles[0], ciphertexts.inputProof],
+        args: [
+          address,
+          bytesToHex(ciphertexts.handles[0]),
+          bytesToHex(ciphertexts.inputProof),
+        ],
       });
 
-      console.log("THX HASH", thx);
+      console.log("TX hash from writeContract:", hash);
+      console.log("chainId in wagmi client", client?.chain?.id);
+      console.log("isConfirming:", isConfirming, "isConfirmed:", isConfirmed);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Unknown error";
       addLog(`Error while writing to blockchain: ${errorMessage}`);
       alert(`Error while writing to blockchain: ${errorMessage}`);
     } finally {
       setIsWriting(false);
-      addLog("Successfully written to blockchain");
     }
   };
 

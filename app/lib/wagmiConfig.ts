@@ -1,13 +1,12 @@
 import { createConfig, http } from "wagmi";
-import { mainnet } from "wagmi/chains";
+import { sepolia } from "wagmi/chains";
 import { injected } from "wagmi/connectors";
 
 export const wagmiConfig = createConfig({
-  chains: [mainnet],
-  connectors: [
-    injected({ shimDisconnect: true }), // MetaMask / OKX / Trust и т.п.
-  ],
+  chains: [sepolia],
+  connectors: [injected({ shimDisconnect: true })],
   transports: {
-    [mainnet.id]: http(),
+    [sepolia.id]: http(),
   },
 });
+
