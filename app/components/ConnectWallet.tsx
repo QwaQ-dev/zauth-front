@@ -1,18 +1,18 @@
-"use client"
+"use client";
 
-import { useAccount, useConnect, useDisconnect } from "wagmi"
+import { useAccount, useConnect, useDisconnect } from "wagmi";
 
 function truncate(addr?: string) {
-  if (!addr) return ""
-  return `${addr.slice(0, 6)}…${addr.slice(-4)}`
+  if (!addr) return "";
+  return `${addr.slice(0, 6)}…${addr.slice(-4)}`;
 }
 
 export default function ConnectWallet() {
-  const { address, isConnected } = useAccount()
-  const { connect, connectors, isPending } = useConnect()
-  const { disconnect } = useDisconnect()
+  const { address, isConnected } = useAccount();
+  const { connect, connectors, isPending } = useConnect();
+  const { disconnect } = useDisconnect();
 
-  const injected = connectors[0]
+  const injected = connectors[0];
 
   return (
     <div className="flex justify-end">
@@ -34,5 +34,5 @@ export default function ConnectWallet() {
         </button>
       )}
     </div>
-  )
+  );
 }

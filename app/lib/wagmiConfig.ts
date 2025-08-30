@@ -1,6 +1,6 @@
-import { createConfig, http } from "wagmi"
-import { mainnet } from "wagmi/chains"
-import { injected } from "wagmi/connectors"
+import { createConfig, http } from "wagmi";
+import { mainnet } from "wagmi/chains";
+import { injected } from "wagmi/connectors";
 
 export const wagmiConfig = createConfig({
   chains: [mainnet],
@@ -8,6 +8,6 @@ export const wagmiConfig = createConfig({
     injected({ shimDisconnect: true }), // MetaMask / OKX / Trust и т.п.
   ],
   transports: {
-    [mainnet.id]: http(), // публичные RPC по умолчанию
+    [mainnet.id]: http(),
   },
-})
+});

@@ -1,57 +1,57 @@
 [
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "userAddr",
-				"type": "address"
-			}
-		],
-		"name": "UserRegistered",
-		"type": "event"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "inputAddr",
-				"type": "address"
-			}
-		],
-		"name": "getUserSocialMediaIndicator",
-		"outputs": [
-			{
-				"internalType": "euint256",
-				"name": "",
-				"type": "bytes32"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "inputAddr",
-				"type": "address"
-			},
-			{
-				"internalType": "externalEuint256",
-				"name": "externalInputValue",
-				"type": "bytes32"
-			},
-			{
-				"internalType": "bytes",
-				"name": "inputProof",
-				"type": "bytes"
-			}
-		],
-		"name": "registerUser",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	}
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "userAddr",
+        "type": "address"
+      }
+    ],
+    "name": "UserRegistered",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "inputAddr",
+        "type": "address"
+      }
+    ],
+    "name": "getUserSocialMediaIndicator",
+    "outputs": [
+      {
+        "internalType": "euint256",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "inputAddr",
+        "type": "address"
+      },
+      {
+        "internalType": "externalEuint256",
+        "name": "externalInputValue",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bytes",
+        "name": "inputProof",
+        "type": "bytes"
+      }
+    ],
+    "name": "registerUser",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
 ]
