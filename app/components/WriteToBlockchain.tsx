@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useClient, useAccount, useWriteContract, useWatchContractEvent } from "wagmi"
+import { useClient, useAccount, useWriteContract, useWaitForTransactionReceipt, type BaseError } from "wagmi"
 import Script from "next/script"
 import type { SocialAccount, WalletAccount } from "../../types"
 import contractABI from "../lib/conctractABI.json"
@@ -23,7 +23,7 @@ const SOCIAL_PLATFORM_IDS: Record<string, number> = {
 export default function WriteToBlockchain({ socials, wallets }: WriteToBlockchainProps) {
   const client = useClient()
   const { address, isConnected } = useAccount()
-  const { writeContract, data: txHash, isPending } = useWriteContract()
+  const { writeContract, data: hash, isPending, error } = useWriteContract()
 
   const [isWriting, setIsWriting] = useState(false)
   const [isFHEInitialized, setIsFHEInitialized] = useState(false)
@@ -36,7 +36,12 @@ export default function WriteToBlockchain({ socials, wallets }: WriteToBlockchai
   const addLog = (message: string) => {
     const timestamp = new Date().toLocaleTimeString("ru-RU", { hour12: false })
     setLogs((prev) => [...prev, { message, timestamp }])
-  }
+  } 
+
+  const { isLoading: isConfirming, isSuccess: isConfirmed } =
+    useWaitForTransactionReceipt({
+      hash,
+    })
 
   // Проверка и инициализация Relayer SDK
   useEffect(() => {
@@ -50,14 +55,6 @@ export default function WriteToBlockchain({ socials, wallets }: WriteToBlockchai
     }
     checkSDK()
   }, [])
-
-  useWatchContractEvent({
-    address: '0x92832861e7678a9823c47893F435353961767e00',
-    abi: contractABI,
-    eventName: 'UserRegistered',
-    onLogs(logs) { console.log('New logs!', logs) },
-    onError(error) { console.log('Error', error) },
-  })
 
   const initializeFHE = async () => {
     addLog("Начинаем инициализацию FHE...")
@@ -133,19 +130,24 @@ export default function WriteToBlockchain({ socials, wallets }: WriteToBlockchai
       }
 
       const contractAddress = "0x92832861e7678a9823c47893F435353961767e00"
+      
+      console.log(address)
 
       const buffer = await fheInstance.createEncryptedInput(contractAddress, address)
-      buffer.add256(BigInt("2339389323922393930"))
+      buffer.add256(BigInt(1))
+      
       const ciphertexts = await buffer.encrypt()
 
       addLog("Данные зашифрованы, отправляем транзакцию...")
 
-      const tx = await writeContract({
+      writeContract({
         address: contractAddress,
         abi: contractABI,
-        functionName: "getUserSocialMediaIndicator",
-        args: [address],
+        functionName: "registerUser",
+        args: [address, ciphertexts.handles[0], ciphertexts.inputProof],
       })
+
+      console.log(ciphertexts)
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Неизвестная ошибка"
       addLog(`Ошибка записи в блокчейн: ${errorMessage}`)
@@ -231,6 +233,9 @@ export default function WriteToBlockchain({ socials, wallets }: WriteToBlockchai
       >
         {isPending || isWriting ? "Шифрование и отправка..." : "Зашифровать и записать в блокчейн"}
       </button>
+      {error && (
+        <div>Error: {(error as BaseError).shortMessage || error.message}</div>
+      )}
     </div>
   )
 }
