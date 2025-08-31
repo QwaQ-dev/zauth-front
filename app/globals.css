@@ -1,6 +1,5 @@
 @import "tailwindcss";
 
-
 :root {
   --background: #eee2d6; /* Light beige background */
   --foreground: #2c2323; /* Dark brown text */
@@ -123,7 +122,7 @@
 
 @font-face {
   font-family: "HomeVideo";
-  src: url("../public/font/MuseoModerno-Regular.ttf") format("opentype");   
+  src: url("../public/font/MuseoModerno-Regular.ttf") format("opentype");
   font-weight: 400;
   font-style: normal;
   font-display: swap;

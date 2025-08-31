@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import type { WalletAccount } from "@/types"
-import { connectWallet, disconnectWallet } from "../lib/walletAuth"
-import Image from "next/image"
+import { useState } from "react";
+import type { WalletAccount } from "@/types";
+import { connectWallet, disconnectWallet } from "../lib/walletAuth";
+import Image from "next/image";
 
 const walletIcons: Record<string, string> = {
   metamask: "/icons/ETH logo.svg",
@@ -12,48 +12,48 @@ const walletIcons: Record<string, string> = {
   solana: "/icons/SOL logo.svg",
   ton: "/icons/TON logo.svg",
   tonkeeper: "/icons/TON logo.svg",
-}
+};
 
 export function WalletList({
   wallets,
   onToggle,
   onWalletConnect,
 }: {
-  wallets: WalletAccount[]
-  onToggle: (id: number) => void
-  onWalletConnect: (id: number, address: string, name: string) => void
+  wallets: WalletAccount[];
+  onToggle: (id: number) => void;
+  onWalletConnect: (id: number, address: string, name: string) => void;
 }) {
-  const [connecting, setConnecting] = useState<number | null>(null)
+  const [connecting, setConnecting] = useState<number | null>(null);
 
   const handleWalletAction = async (wallet: WalletAccount) => {
     if (wallet.isConnected) {
       // Disconnect wallet
-      const success = await disconnectWallet(wallet.key)
+      const success = await disconnectWallet(wallet.key);
       if (success) {
-        onToggle(wallet.id)
+        onToggle(wallet.id);
       }
     } else {
       // Connect wallet
-      setConnecting(wallet.id)
+      setConnecting(wallet.id);
       try {
-        const result = await connectWallet(wallet.key)
+        const result = await connectWallet(wallet.key);
         if (result.success && result.address && result.name) {
-          onWalletConnect(wallet.id, result.address, result.name)
+          onWalletConnect(wallet.id, result.address, result.name);
         } else {
-          alert(result.error || "Failed to connect wallet")
+          alert(result.error || "Failed to connect wallet");
         }
       } catch (error) {
-        console.error("Wallet connection error:", error)
-        alert("Failed to connect wallet")
+        console.error("Wallet connection error:", error);
+        alert("Failed to connect wallet");
       } finally {
-        setConnecting(null)
+        setConnecting(null);
       }
     }
-  }
+  };
 
   return (
     <section className="rounded-2xl border-2 border-black bg-stone-200 p-4 dark-overlay">
-          <div className="space-y-3">
+      <div className="space-y-3">
         {wallets.map((w) => (
           <div
             key={w.id}
@@ -69,7 +69,9 @@ export function WalletList({
                   className="object-contain"
                 />
               </div>
-              <span className="text-base font-semibold text-black">{w.name}</span>
+              <span className="text-base font-semibold text-black">
+                {w.name}
+              </span>
             </div>
 
             <button
@@ -89,5 +91,5 @@ export function WalletList({
         ))}
       </div>
     </section>
-  )
+  );
 }

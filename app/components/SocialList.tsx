@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import type { SocialAccount } from "@/types"
-import { useCallback } from "react"
-import { handleSocialAuth } from "@/app/lib/socialAuth"
-import Image from "next/image"
+import type { SocialAccount } from "@/types";
+import { useCallback } from "react";
+import { handleSocialAuth } from "@/app/lib/socialAuth";
+import Image from "next/image";
 
 const socialIcons: Record<string, string> = {
   twitter: "/icons/X logo.svg",
@@ -12,43 +12,43 @@ const socialIcons: Record<string, string> = {
   telegram: "/icons/Email logo.svg", // Using email icon as placeholder for telegram
   email: "/icons/Email logo.svg",
   farcaster: "/icons/Farcaster logo.svg",
-}
+};
 
 export function SocialList({
   socials,
   onToggle,
   onConnect,
 }: {
-  socials: SocialAccount[]
-  onToggle: (id: number) => void
-  onConnect?: (id: number, platform: string, userData?: any) => void
+  socials: SocialAccount[];
+  onToggle: (id: number) => void;
+  onConnect?: (id: number, platform: string, userData?: any) => void;
 }) {
   const handleClick = useCallback(
     async (social: SocialAccount) => {
       if (social.isConnected) {
-        onToggle(social.id)
+        onToggle(social.id);
       } else {
         try {
-          const userData = await handleSocialAuth(social.key)
+          const userData = await handleSocialAuth(social.key);
 
           // Store user data in localStorage for persistence
-          const userKey = `${social.key}_user_data`
-          localStorage.setItem(userKey, JSON.stringify(userData))
+          const userKey = `${social.key}_user_data`;
+          localStorage.setItem(userKey, JSON.stringify(userData));
 
           // Notify parent component with real user data
-          onConnect?.(social.id, social.key, userData)
+          onConnect?.(social.id, social.key, userData);
         } catch (error) {
-          console.error(`Failed to authenticate with ${social.key}:`, error)
+          console.error(`Failed to authenticate with ${social.key}:`, error);
           // Could show error toast here
         }
       }
     },
     [onToggle, onConnect],
-  )
+  );
 
   return (
     <section className="rounded-2xl border-2 border-black bg-stone-200 p-4 dark-overlay">
-        <div className="space-y-3">
+      <div className="space-y-3">
         {socials.map((s) => (
           <div
             key={s.id}
@@ -79,11 +79,13 @@ export function SocialList({
               aria-label={s.isConnected ? "disconnect" : "connect"}
               title={s.isConnected ? "Click to disconnect" : "Click to connect"}
             >
-              <span className="text-xs font-bold text-black">{s.isConnected ? "✓" : "✕"}</span>
+              <span className="text-xs font-bold text-black">
+                {s.isConnected ? "✓" : "✕"}
+              </span>
             </button>
           </div>
         ))}
       </div>
     </section>
-  )
+  );
 }
