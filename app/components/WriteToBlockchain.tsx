@@ -39,7 +39,6 @@ export default function WriteToBlockchain({
   const { address, isConnected } = useAccount();
   const { writeContract, data: hash, isPending, error } = useWriteContract();
 
-
   const [isWriting, setIsWriting] = useState(false);
   const [isFHEInitialized, setIsFHEInitialized] = useState(false);
   const [fheError, setFheError] = useState<string | null>(null);
@@ -80,14 +79,14 @@ export default function WriteToBlockchain({
             functionName: "getUserSocialMediaIndicator",
             args: [address],
           });
-  
+
           console.log("THX HASH", hash);
           console.log("Indicator raw:", result);
-  
+
           const asBigInt = hexToBigInt(result as `0x${string}`);
           console.log("Indicator as bigint:", asBigInt);
           console.log("Indicator as decimal string:", asBigInt.toString());
-  
+
           addLog("Successfully written to blockchain");
         } catch (err) {
           console.error("Read error", err);
