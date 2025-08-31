@@ -12,7 +12,7 @@ import { readContract } from "wagmi/actions";
 import Script from "next/script";
 import type { SocialAccount, WalletAccount } from "../../types";
 import contractABI from "../lib/conctractABI.json";
-import { wagmiConfig } from "../lib/wagmiConfig.ts";
+import { wagmiConfig } from "../lib/wagmiConfig";
 import { bytesToHex, hexToBigInt } from "viem";
 
 interface WriteToBlockchainProps {
