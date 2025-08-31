@@ -12,7 +12,6 @@
   "dependencies": {
     "@zama-fhe/relayer-sdk": "^0.1.2",
     "ethers": "^6.15.0",
-    "fhevmjs": "^0.6.2",
     "next": "15.5.2",
     "pino": "^9.9.0",
     "react": "19.1.0",

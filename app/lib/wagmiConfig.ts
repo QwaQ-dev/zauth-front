@@ -9,4 +9,3 @@ export const wagmiConfig = createConfig({
     [sepolia.id]: http(),
   },
 });
-

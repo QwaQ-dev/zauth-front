@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
 
     const userData = await userResponse.json();
 
-    // Also fetch user email if not public
+    // Also fetch user email if it's not public
     const emailResponse = await fetch("https://api.github.com/user/emails", {
       headers: {
         Authorization: `Bearer ${token}`,
