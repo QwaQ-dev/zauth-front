@@ -1,18 +1,20 @@
 "use client";
-
+import PropTypes from "prop-types";
+import React from "react";
 import { useEffect, useState } from "react";
 import { SocialList } from "./components/SocialList";
 import { WalletList } from "./components/WalletList";
 import type { SocialAccount, WalletAccount } from "@/types";
 import { useLocalStorage } from "./hooks/useLocalStorage";
 import { useAccount } from "wagmi";
+import Image from "next/image";
 
 const DEFAULT_SOCIALS: SocialAccount[] = [
   { id: 1, key: "github", name: "Connect your GitHub", isConnected: false },
 ];
 
 const DEFAULT_WALLETS: WalletAccount[] = [
-  { id: 1, key: "metamask", name: "Connet your Metamask", isConnected: false },
+  { id: 1, key: "metamask", name: "Connect your Metamask", isConnected: false },
 ];
 
 export default function Page() {
@@ -29,6 +31,8 @@ export default function Page() {
   );
   const [addr, setAddr] = useLocalStorage<string | null>("zauth.address", null);
 
+  const [isActivated, setIsActivated] = useState(false);
+
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -36,6 +40,12 @@ export default function Page() {
   useEffect(() => {
     setAddr(address ?? null);
   }, [address, setAddr]);
+
+  useEffect(() => {
+    if (isActivated == true) {
+      window.location.replace("/fhe");
+    }
+  }, [isActivated]);
 
   const handleSocialConnect = (id: number, key: string, userData: any) => {
     setSocials((prev) =>
@@ -108,14 +118,24 @@ export default function Page() {
             onWalletConnect={handleWalletConnect}
           />
         </div>
-        <div className="mt-6 text-center">
-          <a
-            href="/fhe"
-            className="rounded-full border-2 border-black bg-stone-300 px-6 py-2 text-xl font-medium text-black hover:bg-stone-400 transition-colors duration-200"
-          >
-            Go to FHE
-          </a>
+        <div>
+        <div className="flex gap-1.5 mt-5 ml-30"> <span>Switch to <strong>FHE</strong></span>
+          <Image
+            src="/icons/Knight.svg"
+            alt="Zauth icon logo"
+            width={30}
+            height={30}
+            className="object-contain"
+          />
+
+          <div
+                className={`border-2 border-solid border-[#2c2323] w-11 flex items-center gap-2.5 px-0.5 py-px h-[22px] rounded-[100px] duration-200 relative ${isActivated === true ? "justify-end" : ""} ${isActivated === true ? "bg-[#86ef93]" : "bg-[#f76c68]"}`}
+                onClick={() => {setIsActivated(true);}}
+              >
+                <div className="w-[18px] shadow-[inset_1px_1px_2.8px_-1px_#00000040,0px_0px_4px_#00000040] h-[18px] rounded-[9px] bg-[#f5eae0] relative transition-transform duration-200" />
+              </div>
         </div>
+       </div>
       </section>
     </main>
   );
